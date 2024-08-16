@@ -6,7 +6,7 @@
 // @supportURL    https://github.com/TagoDR/MangaOnlineViewer/issues
 // @namespace     https://github.com/TagoDR
 // @description   Shows all pages at once in online view for these sites: BestPornComix, DoujinMoeNM, 8Muses.com, 8Muses.io, ExHentai, e-Hentai, Fakku.cc, FSIComics, GNTAI.net, HBrowser, Hentai2Read, HentaiEra, HentaiFox, HentaiHand, nHentai.com, HentaIHere, HentaiNexus, hitomi, Imhentai, KingComix, Chochox, Comics18, Koharu, Luscious, MultPorn, MyHentaiGallery, nHentai.net, nHentai.xxx, lhentai, 9Hentai, OmegaScans, PornComixOnline, Pururin, Simply-Hentai, TMOHentai, 3Hentai, Tsumino, vermangasporno, vercomicsporno, wnacg, XlecxOne, xyzcomics, Madara WordPress Plugin, AllPornComic, Manytoon, Manga District
-// @version       2024.07.28
+// @version       2024.08.14
 // @license       MIT
 // @icon          https://cdn-icons-png.flaticon.com/32/9824/9824312.png
 // @run-at        document-end
@@ -368,6 +368,21 @@
         listPages: pages,
         img: "#img",
         lazy: true,
+        async reload(page) {
+          const oldUrl = `${pages[page - 1]}`;
+          const slug = await fetch(oldUrl)
+            .then((res) => res.text())
+            .then((html) => /nl\('([\d-]+)'\)/.exec(html)?.[1]);
+          const newUrl = `${oldUrl}${oldUrl.indexOf("?") ? "&" : "?"}nl=${slug}`;
+          return fetch(newUrl)
+            .then((res) => res.text())
+            .then((html) =>
+              new DOMParser()
+                .parseFromString(html, "text/html")
+                .querySelector(this.img)
+                ?.getAttribute("src"),
+            );
+        },
       };
     },
   };
@@ -795,23 +810,40 @@
     lazy: false,
     waitEle: "nav select option",
     async run() {
+      const options = {
+        method: "GET",
+        headers: {
+          Accept: "*/*",
+          Referer: `${window.location.host}/`,
+          Origin: window.location.host,
+        },
+      };
       const url = window.location.pathname.split("/");
       const galleryID = `${url[2]}/${url[3]}`;
       const detailAPI = `https://api.koharu.to/books/detail/${galleryID}`;
-      const detail = await fetch(detailAPI).then(async (res) => res.json());
-      const dataAPI = `https://api.koharu.to/books/data/${galleryID}/${detail.data["0"].id}/${detail.data["0"].public_key}?v=${detail.updated_at ?? detail.created_at}&w=0`;
-      const data = await fetch(dataAPI).then(async (res) => res.json());
+      const detail = await fetch(detailAPI, options).then(async (res) =>
+        res.json(),
+      );
+      const dataID = Object.keys(detail.data)
+        .map(Number)
+        .sort((a, b) => b - a)[0];
+      const dataAPI = `https://api.koharu.to/books/data/${galleryID}/${detail.data[dataID].id}/${detail.data[dataID].public_key}?v=${detail.updated_at ?? detail.created_at}&w=${dataID}`;
+      const data = await fetch(dataAPI, options)
+        .then(async (res) => res.json())
+        .then(({ base, entries }) =>
+          entries.map((image) => `${base}/${image.path}?w=${dataID}`),
+        );
       return {
         title: detail.title,
         series: `/g/${galleryID}/`,
-        pages: data.entries.length,
+        pages: data.length,
         prev: "#",
         next: "#",
         fetchOptions: {
           method: "GET",
           redirect: "follow",
         },
-        listImages: data.entries.map((image) => `${data.base}/${image.path}`),
+        listImages: data,
       };
     },
   };
@@ -1375,6 +1407,7 @@
             (img) =>
               img.getAttribute("data-src") ??
               img.getAttribute("data-srce") ??
+              img.closest("a")?.getAttribute("href") ??
               img.getAttribute("src"),
           ),
         ),
@@ -4519,32 +4552,42 @@
       applyZoom(zoomVal, pages);
     }
   };
-  function onImagesSuccess(instance) {
-    instance.images.forEach((image) => {
-      image.img.classList.add("imgLoaded");
-      image.img.classList.remove("imgBroken");
-      const thumbId = image.img.id.replace("PageImg", "ThumbnailImg");
-      const thumb = document.getElementById(thumbId);
-      if (thumb) {
-        thumb.setAttribute("src", image.img.getAttribute("src"));
-      }
-      applyLastGlobalZoom(`#${image.img.id}`);
-      updateProgress();
-    });
+  function onImagesSuccess() {
+    return (instance) => {
+      instance.images.forEach((image) => {
+        image.img.classList.add("imgLoaded");
+        image.img.classList.remove("imgBroken");
+        const thumbId = image.img.id.replace("PageImg", "ThumbnailImg");
+        const thumb = document.getElementById(thumbId);
+        if (thumb) {
+          thumb.setAttribute("src", image.img.getAttribute("src"));
+        }
+        applyLastGlobalZoom(`#${image.img.id}`);
+        updateProgress();
+      });
+    };
   }
-  function onImagesFail(instance) {
-    instance.images.forEach((image) => {
-      image.img.classList.add("imgBroken");
-      const src = image.img.getAttribute("src");
-      if (src && getRepeatValue(src) <= getUserSettings().maxReload) {
-        setTimeout(() => {
-          reloadImage(image.img);
-          const imgLoad = imagesLoaded(image.img.parentElement);
-          imgLoad.on("done", onImagesSuccess);
-          imgLoad.on("fail", onImagesFail);
-        }, 2e3);
-      }
-    });
+  function onImagesFail(manga) {
+    return (instance) => {
+      instance.images.forEach((image) => {
+        image.img.classList.add("imgBroken");
+        const src = image.img.getAttribute("src");
+        if (src && getRepeatValue(src) <= getUserSettings().maxReload) {
+          setTimeout(async () => {
+            if (manga.reload) {
+              const id = parseInt(`0${/\d+/.exec(image.img.id)}`, 10);
+              const alt = await manga.reload(id);
+              image.img.setAttribute("src", alt);
+            } else {
+              reloadImage(image.img);
+            }
+            const imgLoad = imagesLoaded(image.img.parentElement);
+            imgLoad.on("done", onImagesSuccess());
+            imgLoad.on("fail", onImagesFail(manga));
+          }, 2e3);
+        }
+      });
+    };
   }
   function normalizeUrl(url) {
     if (url) {
@@ -4577,8 +4620,8 @@
                 .then((blob) => blobUtil.blobToDataURL(blob));
             }
             const imgLoad = imagesLoaded(img.parentElement);
-            imgLoad.on("done", onImagesSuccess);
-            imgLoad.on("fail", onImagesFail);
+            imgLoad.on("done", onImagesSuccess());
+            imgLoad.on("fail", onImagesFail(manga));
             img.setAttribute("src", src);
             logScript("Loaded Image:", index, "Source:", src);
           },
@@ -4591,8 +4634,8 @@
           img,
           () => {
             const imgLoad = imagesLoaded(img.parentElement);
-            imgLoad.on("done", onImagesSuccess);
-            imgLoad.on("fail", onImagesFail);
+            imgLoad.on("done", onImagesSuccess());
+            imgLoad.on("fail", onImagesFail(manga));
             logScript(
               "Lazy Image: ",
               index,
@@ -4617,8 +4660,8 @@
       if (src && img) {
         img.style.width = "auto";
         const imgLoad = imagesLoaded(img.parentElement);
-        imgLoad.on("done", onImagesSuccess);
-        imgLoad.on("fail", onImagesFail);
+        imgLoad.on("done", onImagesSuccess());
+        imgLoad.on("fail", onImagesFail(manga));
         img.setAttribute("src", src);
         logScript(
           `${lazy && "Lazy "}Page: `,
@@ -5527,7 +5570,7 @@
       await new Promise((resolve) => {
         setTimeout(resolve, site.waitTime);
       });
-      logScript("Continuing");
+      logScript("Continuing after timer");
     }
   }
 
@@ -5876,9 +5919,17 @@
           );
       });
     });
-    Promise.race(testedSites)
-      .then(([site, manga]) => preparePage([site, manga]))
-      .catch(logScriptC("Sorry, didnt find any valid site"));
+    Promise.race(
+      testedSites.map((promise, index) => promise.then(() => index)),
+    ).then((fastestIndex) => {
+      testedSites.forEach((_promise, i) => {
+        if (i !== fastestIndex)
+          logScript(`Failed/Skipped: ${foundSites[i].name}`);
+      });
+      testedSites[fastestIndex].then((result) => {
+        preparePage(result);
+      });
+    });
   }
 
   start(sites).catch(logScript);

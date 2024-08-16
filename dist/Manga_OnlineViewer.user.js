@@ -5,8 +5,8 @@
 // @downloadURL   https://github.com/TagoDR/MangaOnlineViewer/raw/master/dist/Manga_OnlineViewer.user.js
 // @supportURL    https://github.com/TagoDR/MangaOnlineViewer/issues
 // @namespace     https://github.com/TagoDR
-// @description   Shows all pages at once in online view for these sites: Alandal, Asura Scans, Batoto, BilibiliComics, ComiCastle, Comick, Dynasty-Scans, INKR, InManga, KLManga, Leitor, LHTranslation, Local Files, LynxScans, MangaBuddy, MangaDex, MangaFox, MangaHere, Mangago, MangaHosted, MangaHub, MangasIn, MangaKakalot, MangaNelo, MangaNato, MangaOni, MangaPark, Mangareader, MangaSee, Manga4life, MangaTigre, MangaToons, MangaTown, ManhuaScan, ManhwaWeb, MangaGeko.com, MangaGeko.cc, NaniScans, NineManga, OlympusScans, PandaManga, RawDevart, ReadComicsOnline, ReadManga Today, ReaperScans, SenManga(Raw), KLManga, TenManga, TuMangaOnline, TuManhwas, UnionMangas, WebNovel, WebToons, Manga33, YugenMangas, ZeroScans, MangaStream WordPress Plugin, Flame Comics, Realm Oasis, Voids-Scans, Luminous Scans, Shimada Scans, Night Scans, Manhwa-Freak, OzulScansEn, AzureManga, CypherScans, MangaGalaxy, LuaScans, Drake Scans, FoOlSlide, Kireicake, Madara WordPress Plugin, MangaHaus, Isekai Scan, Comic Kiba, Zinmanga, mangatx, Toonily, Mngazuki, JaiminisBox, DisasterScans, ManhuaPlus, TopManhua, NovelMic, Reset-Scans, LeviatanScans, Dragon Tea, SetsuScans, ToonGod
-// @version       2024.07.28
+// @description   Shows all pages at once in online view for these sites: Alandal, Asura Scans, Batoto, BilibiliComics, ComiCastle, Comick, Dynasty-Scans, INKR, InManga, KLManga, Leitor, LHTranslation, Local Files, LynxScans, MangaBuddy, MangaDex, MangaFox, MangaHere, Mangago, MangaHosted, MangaHub, MangasIn, MangaKakalot, MangaNelo, MangaNato, MangaOni, MangaPark, Mangareader, MangaSee, Manga4life, MangaTigre, MangaToons, MangaTown, ManhuaScan, ManhwaWeb, MangaGeko.com, MangaGeko.cc, NaniScans, NineManga, OlympusScans, PandaManga, RawDevart, ReadComicsOnline, ReadManga Today, ReaperScans, SenManga(Raw), KLManga, TenManga, TuMangaOnline, TuManhwas, UnionMangas, WebNovel, WebToons, Manga33, YugenMangas, ZeroScans, MangaStream WordPress Plugin, Flame Comics, Realm Oasis, Voids-Scans, Luminous Scans, Shimada Scans, Night Scans, Manhwa-Freak, OzulScansEn, CypherScans, MangaGalaxy, LuaScans, Drake Scans, FoOlSlide, Kireicake, Madara WordPress Plugin, MangaHaus, Isekai Scan, Comic Kiba, Zinmanga, mangatx, Toonily, Mngazuki, JaiminisBox, DisasterScans, ManhuaPlus, TopManhua, NovelMic, Reset-Scans, LeviatanScans, Dragon Tea, SetsuScans, ToonGod
+// @version       2024.08.14
 // @license       MIT
 // @icon          https://cdn-icons-png.flaticon.com/32/2281/2281832.png
 // @run-at        document-end
@@ -67,7 +67,7 @@
 // @include       /https?:\/\/(www\.)?rawdevart.com\/comic\/.+\/.+\//
 // @include       /https?:\/\/(www\.)?readcomicsonline.ru\/comic\/.*\/\d*/
 // @include       /https?:\/\/(www\.)?readm.today\/.+\/\d+/
-// @include       /https?:\/\/(www\.)?reaperscans\.com\/comics\/.+\/chapters\/.+/
+// @include       /https?:\/\/(www\.)?reaperscans\.com\/series\/.+\/chapter.+/
 // @include       /https?:\/\/raw\.senmanga.com\/.+\/.+\/?/
 // @include       /https?:\/\/(www\.)?tapas.io\/episode\/.+/
 // @include       /https?:\/\/(www\.)?(tenmanga|gardenmanage).com\/(chapter|statuses)\/.+/
@@ -79,7 +79,7 @@
 // @include       /https?:\/\/(www\.)?(manga33).com\/manga\/.+/
 // @include       /https?:\/\/(www\.)?(yugenmangas).(com|net|lat)\/series\/.+/
 // @include       /https?:\/\/(www\.)?zscans.com\/comics\/.+/
-// @include       /https?:\/\/.+\/(chapter\/)?.+$/
+// @include       /https?:\/\/[^/]*(scans|comic|realmoasis|hivetoon)[^/]*\/.+/
 // @include       /^(?!.*jaiminisbox).*\/read\/.+/
 // @include       /https?:\/\/.+\/(manga|series|manhua|comic|ch|novel|webtoon)\/.+\/.+/
 // @exclude       /https?:\/\/(www\.)?tsumino.com\/.+/
@@ -141,10 +141,10 @@
     homepage: "https://asuracomic.net/",
     language: ["English"],
     category: "manga",
-    waitEle: 'img[alt="chapter"]',
+    waitEle: 'img[alt*="chapter"]',
     waitTime: 2e3,
     run() {
-      const images = [...document.querySelectorAll('img[alt="chapter"]')];
+      const images = [...document.querySelectorAll('img[alt*="chapter"]')];
       return {
         title: document.querySelector("h2")?.textContent?.trim(),
         series: findOneByContentStarts(
@@ -1411,28 +1411,25 @@
       "Night Scans",
       "Manhwa-Freak",
       "OzulScansEn",
-      "AzureManga",
       "CypherScans",
       "MangaGalaxy",
       "LuaScans",
       "Drake Scans",
     ],
-    url: /https?:\/\/.+\/(chapter\/)?.+$/,
+    url: /https?:\/\/[^/]*(scans|comic|realmoasis|hivetoon)[^/]*\/.+/,
     homepage: [
       "https://themesia.com/mangastream-wordpress-theme/",
       "https://flamecomics.com/",
       "https://realmoasis.com/",
       "https://void-scans.com/",
-      "https://luminousscans.com/",
+      "https://luminous-scans.com/",
       "https://shimadascans.com/",
       "https://night-scans.com/",
       "https://freakcomic.com/",
       "https://ozulscansen.com/",
-      "https://azuremanga.com/",
       "https://cypherscans.xyz/",
       "https://mangagalaxy.me/",
       "https://luascans.com/",
-      "https://manhwa-freak.org/",
       "https://drake-scans.com/",
     ],
     language: ["English"],
@@ -1821,27 +1818,31 @@
 
   const reaperscans = {
     name: "ReaperScans",
-    url: /https?:\/\/(www\.)?reaperscans\.com\/comics\/.+\/chapters\/.+/,
+    url: /https?:\/\/(www\.)?reaperscans\.com\/series\/.+\/chapter.+/,
     homepage: "https://reaperscans.com/",
     language: ["English"],
     category: "manga",
-    waitEle: "main img",
     run() {
-      const images = [...document.querySelectorAll("main img")];
+      const images = [
+        ...document.querySelectorAll("#content .container img:not(.rounded)"),
+      ];
       return {
         title: document.querySelector("title")?.textContent?.trim(),
         series: document
-          .querySelector(".fa-list")
-          ?.parentElement?.getAttribute("href"),
+          .querySelector("button .fa-house")
+          ?.closest("a")
+          ?.getAttribute("href"),
         pages: images.length,
         prev: document
-          .querySelector(".fa-arrow-left-long")
-          ?.parentElement?.getAttribute("href"),
+          .querySelector(".fa-chevron-left")
+          ?.closest("a")
+          ?.getAttribute("href"),
         next: document
-          .querySelector(".fa-arrow-right-long")
-          ?.parentElement?.getAttribute("href"),
+          .querySelector(".fa-chevron-right")
+          ?.closest("a")
+          ?.getAttribute("href"),
         listImages: images.map(
-          (img) => img.getAttribute("data-src") ?? img.getAttribute("src"),
+          (img) => img.getAttribute("data-src") || img.getAttribute("src"),
         ),
       };
     },
@@ -4997,32 +4998,42 @@
       applyZoom(zoomVal, pages);
     }
   };
-  function onImagesSuccess(instance) {
-    instance.images.forEach((image) => {
-      image.img.classList.add("imgLoaded");
-      image.img.classList.remove("imgBroken");
-      const thumbId = image.img.id.replace("PageImg", "ThumbnailImg");
-      const thumb = document.getElementById(thumbId);
-      if (thumb) {
-        thumb.setAttribute("src", image.img.getAttribute("src"));
-      }
-      applyLastGlobalZoom(`#${image.img.id}`);
-      updateProgress();
-    });
+  function onImagesSuccess() {
+    return (instance) => {
+      instance.images.forEach((image) => {
+        image.img.classList.add("imgLoaded");
+        image.img.classList.remove("imgBroken");
+        const thumbId = image.img.id.replace("PageImg", "ThumbnailImg");
+        const thumb = document.getElementById(thumbId);
+        if (thumb) {
+          thumb.setAttribute("src", image.img.getAttribute("src"));
+        }
+        applyLastGlobalZoom(`#${image.img.id}`);
+        updateProgress();
+      });
+    };
   }
-  function onImagesFail(instance) {
-    instance.images.forEach((image) => {
-      image.img.classList.add("imgBroken");
-      const src = image.img.getAttribute("src");
-      if (src && getRepeatValue(src) <= getUserSettings().maxReload) {
-        setTimeout(() => {
-          reloadImage(image.img);
-          const imgLoad = imagesLoaded(image.img.parentElement);
-          imgLoad.on("done", onImagesSuccess);
-          imgLoad.on("fail", onImagesFail);
-        }, 2e3);
-      }
-    });
+  function onImagesFail(manga) {
+    return (instance) => {
+      instance.images.forEach((image) => {
+        image.img.classList.add("imgBroken");
+        const src = image.img.getAttribute("src");
+        if (src && getRepeatValue(src) <= getUserSettings().maxReload) {
+          setTimeout(async () => {
+            if (manga.reload) {
+              const id = parseInt(`0${/\d+/.exec(image.img.id)}`, 10);
+              const alt = await manga.reload(id);
+              image.img.setAttribute("src", alt);
+            } else {
+              reloadImage(image.img);
+            }
+            const imgLoad = imagesLoaded(image.img.parentElement);
+            imgLoad.on("done", onImagesSuccess());
+            imgLoad.on("fail", onImagesFail(manga));
+          }, 2e3);
+        }
+      });
+    };
   }
   function normalizeUrl(url) {
     if (url) {
@@ -5055,8 +5066,8 @@
                 .then((blob) => blobUtil.blobToDataURL(blob));
             }
             const imgLoad = imagesLoaded(img.parentElement);
-            imgLoad.on("done", onImagesSuccess);
-            imgLoad.on("fail", onImagesFail);
+            imgLoad.on("done", onImagesSuccess());
+            imgLoad.on("fail", onImagesFail(manga));
             img.setAttribute("src", src);
             logScript("Loaded Image:", index, "Source:", src);
           },
@@ -5069,8 +5080,8 @@
           img,
           () => {
             const imgLoad = imagesLoaded(img.parentElement);
-            imgLoad.on("done", onImagesSuccess);
-            imgLoad.on("fail", onImagesFail);
+            imgLoad.on("done", onImagesSuccess());
+            imgLoad.on("fail", onImagesFail(manga));
             logScript(
               "Lazy Image: ",
               index,
@@ -5095,8 +5106,8 @@
       if (src && img) {
         img.style.width = "auto";
         const imgLoad = imagesLoaded(img.parentElement);
-        imgLoad.on("done", onImagesSuccess);
-        imgLoad.on("fail", onImagesFail);
+        imgLoad.on("done", onImagesSuccess());
+        imgLoad.on("fail", onImagesFail(manga));
         img.setAttribute("src", src);
         logScript(
           `${lazy && "Lazy "}Page: `,
@@ -6108,7 +6119,7 @@
       await new Promise((resolve) => {
         setTimeout(resolve, site.waitTime);
       });
-      logScript("Continuing");
+      logScript("Continuing after timer");
     }
   }
 
@@ -6424,9 +6435,17 @@
           );
       });
     });
-    Promise.race(testedSites)
-      .then(([site, manga]) => preparePage([site, manga]))
-      .catch(logScriptC("Sorry, didnt find any valid site"));
+    Promise.race(
+      testedSites.map((promise, index) => promise.then(() => index)),
+    ).then((fastestIndex) => {
+      testedSites.forEach((_promise, i) => {
+        if (i !== fastestIndex)
+          logScript(`Failed/Skipped: ${foundSites[i].name}`);
+      });
+      testedSites[fastestIndex].then((result) => {
+        preparePage(result);
+      });
+    });
   }
 
   start(sites).catch(logScript);
