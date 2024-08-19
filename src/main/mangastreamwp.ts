@@ -14,8 +14,9 @@ export default {
     'MangaGalaxy',
     'LuaScans',
     'Drake Scans',
+    'Rizzfables',
   ],
-  url: /https?:\/\/[^/]*(scans|comic|realmoasis|hivetoon)[^/]*\/.+/,
+  url: /https?:\/\/[^/]*(scans|comic|realmoasis|hivetoon|rizzfables)[^/]*\/.+/,
   homepage: [
     'https://themesia.com/mangastream-wordpress-theme/',
     'https://asuratoon.net/',
@@ -31,6 +32,7 @@ export default {
     'https://mangagalaxy.me/',
     'https://luascans.com/',
     'https://drake-scans.com/',
+    'https://rizzfables.com/',
   ],
   language: ['English'],
   category: 'manga',
