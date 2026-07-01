@@ -36,7 +36,7 @@ class LateStartStoryWrapper extends LitElement {
     if (this.themeStyleElement) return;
     this.themeStyleElement = document.createElement('style');
     this.themeStyleElement.id = 'mov-theme-styles-story';
-    this.themeStyleElement.textContent = themesCSS();
+    this.themeStyleElement.textContent = themesCSS().toString();
     document.head.append(this.themeStyleElement);
   }
 
