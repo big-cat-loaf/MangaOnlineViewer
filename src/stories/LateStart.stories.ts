@@ -3,6 +3,7 @@ import { html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { themesCSS } from '../ui/themes';
 import '../ui/Startup.ts';
+
 // Mock data for the story
 const MOCK_BEGIN = 10;
 

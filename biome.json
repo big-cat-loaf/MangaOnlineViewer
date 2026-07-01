@@ -28,6 +28,9 @@
       "preset": "recommended",
       "correctness": {
         "noUnusedVariables": "warn"
+      },
+      "a11y": {
+        "noSvgWithoutTitle": "off"
       }
     }
   },
@@ -47,11 +50,6 @@
   "html": {
     "experimentalFullSupportEnabled": true
   },
-  "overrides": [
-    {
-      "includes": ["*.svg"]
-    }
-  ],
   "assist": {
     "enabled": true,
     "actions": {
