@@ -7,10 +7,12 @@ const hentainexus: ISite = {
   homepage: 'https://hentainexus.com/',
   language: [Language.ENGLISH],
   category: Category.HENTAI,
+  waitVar: 'pageData',
   run(): IManga {
-    const images =
-      unsafeWindow.pageData?.map((i: { image: string }) => i.image) ??
-      unsafeWindow.images?.map((i: { url: string }) => i.url);
+    const images = unsafeWindow.pageData?.map(
+      (i: { image_avif: string; image_fallback: string; image?: string }) =>
+        i.image_avif ?? i.image_fallback ?? i.image,
+    );
     return {
       title: document
         .querySelector('title')
