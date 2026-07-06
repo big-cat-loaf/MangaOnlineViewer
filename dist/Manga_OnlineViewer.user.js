@@ -6,7 +6,7 @@
 // @supportURL    https://github.com/TagoDR/MangaOnlineViewer/issues
 // @namespace     https://github.com/TagoDR
 // @description   Shows all pages at once in online view for these sites: Asura Scans, Batoto, BilibiliComics, Comick, Comix.to, Dynasty-Scans, Flame Comics, Ikigai Mangas - EltaNews, Ikigai Mangas - Ajaco, Kagane, KuManga, LeerCapitulo, LHTranslation, Local Files, M440, MangaBuddy, MangaDex, MangaFox, MangaHere, Mangago, MangaHub, MangaKakalot, NeloManga, MangaNato, NatoManga, MangaBats, MangaBall, MangaOni, MangaPark, MangaReader, MangaToons, MangaTown, ManhwaWeb, MangaGeko.com, MangaGeko.cc, NineAnime, Olympus, QiManhwa, ReadComicsOnline, ReaperScans, TuMangaOnline, WebNovel, WebToons, WeebCentral, WeebDex, Vortex Scans, ZeroScans, MangaStream WordPress Plugin, Realm Oasis, Voids-Scans, Luminous Scans, Shimada Scans, Night Scans, Manhwa-Freak, OzulScansEn, CypherScans, MangaGalaxy, LuaScans, Drake Scans, Rizzfables, NovatoScans, TresDaos, Lectormiau, NTRGod, Threedaos, FoOlSlide, Kireicake, Madara WordPress Plugin, MangaHaus, Isekai Scan, Comic Kiba, Zinmanga, mangatx, Toonily, Mngazuki, JaiminisBox, DisasterScans, ManhuaPlus, TopManhua, NovelMic, Reset-Scans, LeviatanScans, Dragon Tea, SetsuScans, ToonGod, Hades Scans
-// @version       2026.06.30.build-2044
+// @version       2026.07.06.build-2159
 // @license       MIT
 // @icon          https://cdn-icons-png.flaticon.com/32/2281/2281832.png
 // @run-at        document-end
@@ -439,8 +439,13 @@
 	//#region node_modules/nanostores/atom/index.js
 	var listenerQueue = [];
 	var lqIndex = 0;
+	var batchSeen = null;
 	var QUEUE_ITEMS_PER_LISTENER = 4;
 	var nanostoresGlobal = globalThis.nanostoresGlobal ||= { epoch: 0 };
+	var drainQueue = () => {
+		for (lqIndex = 0; lqIndex < listenerQueue.length; lqIndex += QUEUE_ITEMS_PER_LISTENER) listenerQueue[lqIndex](listenerQueue[lqIndex + 1].value, listenerQueue[lqIndex + 2], listenerQueue[lqIndex + 3]);
+		listenerQueue.length = 0;
+	};
 	var atom = /* @__NO_SIDE_EFFECTS__ */ (initialValue) => {
 		let listeners = [];
 		let $atom = {
@@ -464,12 +469,13 @@
 			},
 			notify(oldValue, changedKey) {
 				nanostoresGlobal.epoch++;
-				let runListenerQueue = !listenerQueue.length;
-				for (let listener of listeners) listenerQueue.push(listener, $atom.value, oldValue, changedKey);
-				if (runListenerQueue) {
-					for (lqIndex = 0; lqIndex < listenerQueue.length; lqIndex += QUEUE_ITEMS_PER_LISTENER) listenerQueue[lqIndex](listenerQueue[lqIndex + 1], listenerQueue[lqIndex + 2], listenerQueue[lqIndex + 3]);
-					listenerQueue.length = 0;
+				let runListenerQueue = !listenerQueue.length && !batchSeen;
+				for (let listener of listeners) {
+					if (batchSeen?.has(listener)) continue;
+					batchSeen?.add(listener);
+					listenerQueue.push(listener, $atom, oldValue, batchSeen ? void 0 : changedKey);
 				}
+				if (runListenerQueue) drainQueue();
 			},
 			off() {},
 			set(newValue) {
@@ -2933,7 +2939,7 @@
 		return applyColorsToSvg(rawSvg, `icon-tabler-${_.kebabCase(iconKey.replace(/^Icon/, ""))}`);
 	});
 	//#endregion
-	//#region \0@oxc-project+runtime@0.137.0/helpers/esm/decorate.js
+	//#region \0@oxc-project+runtime@0.138.0/helpers/esm/decorate.js
 	function __decorate(decorators, target, key, desc) {
 		var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
 		if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -11624,7 +11630,7 @@
 		elements?.forEach(removeAllEventListeners);
 	};
 	//#endregion
-	//#region \0@oxc-project+runtime@0.137.0/helpers/esm/taggedTemplateLiteral.js
+	//#region \0@oxc-project+runtime@0.138.0/helpers/esm/taggedTemplateLiteral.js
 	function _taggedTemplateLiteral(e, t) {
 		return t || (t = e.slice(0)), Object.freeze(Object.defineProperties(e, { raw: { value: Object.freeze(t) } }));
 	}
