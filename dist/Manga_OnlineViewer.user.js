@@ -5,8 +5,8 @@
 // @downloadURL   https://github.com/TagoDR/MangaOnlineViewer/raw/master/dist/Manga_OnlineViewer.user.js
 // @supportURL    https://github.com/TagoDR/MangaOnlineViewer/issues
 // @namespace     https://github.com/TagoDR
-// @description   Shows all pages at once in online view for these sites: Asura Scans, Batoto, BilibiliComics, Comick, Comix.to, Dynasty-Scans, Flame Comics, Ikigai Mangas - EltaNews, Ikigai Mangas - Ajaco, Kagane, KuManga, LeerCapitulo, LHTranslation, Local Files, M440, MangaBuddy, MangaDex, MangaFox, MangaHere, Mangago, MangaHub, MangaKakalot, NeloManga, MangaNato, NatoManga, MangaBats, MangaBall, MangaOni, MangaPark, MangaReader, MangaToons, MangaTown, ManhwaWeb, MangaGeko.com, MangaGeko.cc, NineAnime, Olympus, QiManhwa, ReadComicsOnline, ReaperScans, TuMangaOnline, WebNovel, WebToons, WeebCentral, WeebDex, Vortex Scans, ZeroScans, MangaStream WordPress Plugin, Realm Oasis, Voids-Scans, Luminous Scans, Shimada Scans, Night Scans, Manhwa-Freak, OzulScansEn, CypherScans, MangaGalaxy, LuaScans, Drake Scans, Rizzfables, NovatoScans, TresDaos, Lectormiau, NTRGod, Threedaos, FoOlSlide, Kireicake, Madara WordPress Plugin, MangaHaus, Isekai Scan, Comic Kiba, Zinmanga, mangatx, Toonily, Mngazuki, JaiminisBox, DisasterScans, ManhuaPlus, TopManhua, NovelMic, Reset-Scans, LeviatanScans, Dragon Tea, SetsuScans, ToonGod, Hades Scans
-// @version       2026.07.06.build-2159
+// @description   Shows all pages at once in online view for these sites: Asura Scans, Batoto, BilibiliComics, Comick, Comix.to, DemonicScans, Dynasty-Scans, Flame Comics, Ikigai Mangas - EltaNews, Ikigai Mangas - Ajaco, Kagane, KuManga, LeerCapitulo, LHTranslation, Local Files, M440, MangaBuddy, MangaDex, MangaFox, MangaHere, Mangago, MangaHub, MangaKakalot, NeloManga, MangaNato, NatoManga, MangaBats, MangaBall, MangaOni, MangaPark, MangaReader, MangaToons, MangaTown, ManhwaWeb, MangaGeko.com, MangaGeko.cc, NineAnime, Olympus, QiManhwa, ReadComicsOnline, ReaperScans, TuMangaOnline, WebNovel, WebToons, WeebCentral, WeebDex, Vortex Scans, ZeroScans, MangaStream WordPress Plugin, Realm Oasis, Voids-Scans, Luminous Scans, Shimada Scans, Night Scans, Manhwa-Freak, OzulScansEn, CypherScans, MangaGalaxy, LuaScans, Drake Scans, Rizzfables, NovatoScans, TresDaos, Lectormiau, NTRGod, Threedaos, FoOlSlide, Kireicake, Madara WordPress Plugin, MangaHaus, Isekai Scan, Comic Kiba, Zinmanga, mangatx, Toonily, Mngazuki, JaiminisBox, DisasterScans, ManhuaPlus, TopManhua, NovelMic, Reset-Scans, LeviatanScans, Dragon Tea, SetsuScans, ToonGod, Hades Scans
+// @version       2026.07.10.build-2030
 // @license       MIT
 // @icon          https://cdn-icons-png.flaticon.com/32/2281/2281832.png
 // @run-at        document-end
@@ -32,6 +32,7 @@
 // @include       /https?:\/\/(www\.)?(bilibilicomics).net\/episode\/.+/
 // @include       /https?:\/\/(www\.)?comick.io\/.+/
 // @include       /https?:\/\/comix\.to\/(title|comic)\/.+\/.+/
+// @include       /https?:\/\/(www\.)?demonicscans\.org\/(title\/.+\/chapter\/.+|chaptered\.php\?manga=\d+&chapter=.+)/
 // @include       /https?:\/\/(www\.)?dynasty-scans.com\/chapters\/.+/
 // @include       /https?:\/\/(www.)?(flamecomics).(xyz)\/series\/.+/
 // @include       /https?:\/\/(visorikigai|visualikigai).(ajaco|eltanews|foodib|jobswu).(com|net|site)\/capitulo\/\d+/
@@ -407,6 +408,20 @@
 			});
 		});
 	}
+	/**
+	* Waits for a promise to resolve, but with a maximum timeout.
+	* If the promise does not resolve within the timeout period, the race is lost and the returned promise rejects.
+	* @template T
+	* @param {Promise<T>} promise - The promise to wait for.
+	* @param {number} [timeout=5000] - The maximum time to wait in milliseconds.
+	* @returns {Promise<T>} A promise that resolves with the result of the input promise, or rejects if it times out.
+	*/
+	async function waitWithTimeout(promise, timeout = 5e3) {
+		const timeoutPromise = new Promise((_, reject) => {
+			setTimeout(() => reject(/* @__PURE__ */ new Error(`Timeout after ${timeout} ms`)), timeout);
+		});
+		return Promise.race([promise, timeoutPromise]);
+	}
 	//#endregion
 	//#region src/core/check.ts
 	/**
@@ -615,16 +630,45 @@
 			}
 		};
 		return $map;
-	}, t$5 = globalThis, i$6 = (t) => t, s$4 = t$5.trustedTypes, e$9 = s$4 ? s$4.createPolicy("lit-html", { createHTML: (t) => t }) : void 0, h$4 = "$lit$", o$12 = `lit$${Math.random().toFixed(9).slice(2)}$`, n$7 = "?" + o$12, r$7 = `<${n$7}>`, l$2 = document, c$4 = () => l$2.createComment(""), a$1 = (t) => null === t || "object" != typeof t && "function" != typeof t, u$2 = Array.isArray, d$3 = (t) => u$2(t) || "function" == typeof t?.[Symbol.iterator], f$3 = "[ 	\n\f\r]", v$1 = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, _$1 = /-->/g, m$1 = />/g, p$2 = RegExp(`>|${f$3}(?:([^\\s"'>=/]+)(${f$3}*=${f$3}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`, "g"), g = /'/g, $ = /"/g, y$1 = /^(?:script|style|textarea|title)$/i, x = (t) => (i, ...s) => ({
-		_$litType$: t,
-		strings: i,
-		values: s
-	}), b$1 = x(1), E = Symbol.for("lit-noChange"), A = Symbol.for("lit-nothing"), C = /* @__PURE__ */ new WeakMap(), P = l$2.createTreeWalker(l$2, 129);
+	};
+	//#endregion
+	//#region node_modules/lit-html/lit-html.js
 	/**
 	* @license
 	* Copyright 2017 Google LLC
 	* SPDX-License-Identifier: BSD-3-Clause
 	*/
+	var t$5 = globalThis;
+	var i$6 = (t) => t;
+	var s$4 = t$5.trustedTypes;
+	var e$9 = s$4 ? s$4.createPolicy("lit-html", { createHTML: (t) => t }) : void 0;
+	var h$4 = "$lit$";
+	var o$12 = `lit$${Math.random().toFixed(9).slice(2)}$`;
+	var n$7 = "?" + o$12;
+	var r$7 = `<${n$7}>`;
+	var l$2 = document;
+	var c$4 = () => l$2.createComment("");
+	var a$1 = (t) => null === t || "object" != typeof t && "function" != typeof t;
+	var u$2 = Array.isArray;
+	var d$3 = (t) => u$2(t) || "function" == typeof t?.[Symbol.iterator];
+	var f$3 = "[ 	\n\f\r]";
+	var v$1 = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g;
+	var _$1 = /-->/g;
+	var m$1 = />/g;
+	var p$2 = RegExp(`>|${f$3}(?:([^\\s"'>=/]+)(${f$3}*=${f$3}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`, "g");
+	var g = /'/g;
+	var $ = /"/g;
+	var y$1 = /^(?:script|style|textarea|title)$/i;
+	var x = (t) => (i, ...s) => ({
+		_$litType$: t,
+		strings: i,
+		values: s
+	});
+	var b$1 = x(1);
+	var E = Symbol.for("lit-noChange");
+	var A = Symbol.for("lit-nothing");
+	var C = /* @__PURE__ */ new WeakMap();
+	var P = l$2.createTreeWalker(l$2, 129);
 	function V(t, i) {
 		if (!u$2(t) || !t.hasOwnProperty("raw")) throw Error("invalid template strings array");
 		return void 0 !== e$9 ? e$9.createHTML(i) : i;
@@ -869,7 +913,8 @@
 		U: z,
 		B: I,
 		F: Z
-	}, B = t$5.litHtmlPolyfillSupport;
+	};
+	var B = t$5.litHtmlPolyfillSupport;
 	B?.(S$1, k), (t$5.litHtmlVersions ??= []).push("3.3.3");
 	var D = (t, i, s) => {
 		const e = s?.renderBefore ?? i;
@@ -899,7 +944,8 @@
 		BOOLEAN_ATTRIBUTE: 4,
 		EVENT: 5,
 		ELEMENT: 6
-	}, e$7 = (t) => (...e) => ({
+	};
+	var e$7 = (t) => (...e) => ({
 		_$litDirective$: t,
 		values: e
 	});
@@ -929,13 +975,15 @@
 		if (void 0 === e) return !1;
 		for (const i of e) i._$AO?.(t, !1), s$2(i, t);
 		return !0;
-	}, o$11 = (i) => {
+	};
+	var o$11 = (i) => {
 		let t, e;
 		do {
 			if (void 0 === (t = i._$AM)) break;
 			e = t._$AN, e.delete(i), i = t;
 		} while (0 === e?.size);
-	}, r$5 = (i) => {
+	};
+	var r$5 = (i) => {
 		for (let t; t = i._$AM; i = t) {
 			let e = t._$AN;
 			if (void 0 === e) t._$AN = e = /* @__PURE__ */ new Set();
@@ -983,7 +1031,8 @@
 	* SPDX-License-Identifier: BSD-3-Clause
 	*/ var e$6 = () => new h$1();
 	var h$1 = class {};
-	var o$10 = /* @__PURE__ */ new WeakMap(), n$4 = e$7(class extends f$1 {
+	var o$10 = /* @__PURE__ */ new WeakMap();
+	var n$4 = e$7(class extends f$1 {
 		render(i) {
 			return A;
 		}
@@ -1895,7 +1944,10 @@
 	* Copyright 2019 Google LLC
 	* SPDX-License-Identifier: BSD-3-Clause
 	*/
-	var t$2 = globalThis, e$5 = t$2.ShadowRoot && (void 0 === t$2.ShadyCSS || t$2.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, s$1 = Symbol(), o$9 = /* @__PURE__ */ new WeakMap();
+	var t$2 = globalThis;
+	var e$5 = t$2.ShadowRoot && (void 0 === t$2.ShadyCSS || t$2.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype;
+	var s$1 = Symbol();
+	var o$9 = /* @__PURE__ */ new WeakMap();
 	var n$3 = class {
 		constructor(t, e, o) {
 			if (this._$cssResult$ = !0, o !== s$1) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
@@ -1914,19 +1966,22 @@
 			return this.cssText;
 		}
 	};
-	var r$4 = (t) => new n$3("string" == typeof t ? t : t + "", void 0, s$1), i$3 = (t, ...e) => {
+	var r$4 = (t) => new n$3("string" == typeof t ? t : t + "", void 0, s$1);
+	var i$3 = (t, ...e) => {
 		return new n$3(1 === t.length ? t[0] : e.reduce((e, s, o) => e + ((t) => {
 			if (!0 === t._$cssResult$) return t.cssText;
 			if ("number" == typeof t) return t;
 			throw Error("Value passed to 'css' function must be a 'css' function result: " + t + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
 		})(s) + t[o + 1], t[0]), t, s$1);
-	}, S = (s, o) => {
+	};
+	var S = (s, o) => {
 		if (e$5) s.adoptedStyleSheets = o.map((t) => t instanceof CSSStyleSheet ? t : t.styleSheet);
 		else for (const e of o) {
 			const o = document.createElement("style"), n = t$2.litNonce;
 			void 0 !== n && o.setAttribute("nonce", n), o.textContent = e.cssText, s.appendChild(o);
 		}
-	}, c$1 = e$5 ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((t) => {
+	};
+	var c$1 = e$5 ? (t) => t : (t) => t instanceof CSSStyleSheet ? ((t) => {
 		let e = "";
 		for (const s of t.cssRules) e += s.cssText;
 		return r$4(e);
@@ -2218,7 +2273,8 @@
 		converter: u,
 		reflect: !1,
 		hasChanged: f
-	}, r$2 = (t = o$6, e, r) => {
+	};
+	var r$2 = (t = o$6, e, r) => {
 		const { kind: n, metadata: i } = r;
 		let s = globalThis.litPropertyMetadata.get(i);
 		if (void 0 === s && globalThis.litPropertyMetadata.set(i, s = /* @__PURE__ */ new Map()), "setter" === n && ((t = Object.create(t)).wrapped = !0), s.set(r.name, t), "accessor" === n) {
@@ -2939,7 +2995,7 @@
 		return applyColorsToSvg(rawSvg, `icon-tabler-${_.kebabCase(iconKey.replace(/^Icon/, ""))}`);
 	});
 	//#endregion
-	//#region \0@oxc-project+runtime@0.138.0/helpers/esm/decorate.js
+	//#region \0@oxc-project+runtime@0.139.0/helpers/esm/decorate.js
 	function __decorate(decorators, target, key, desc) {
 		var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
 		if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -4261,7 +4317,9 @@
 	* @license
 	* Copyright 2018 Google LLC
 	* SPDX-License-Identifier: BSD-3-Clause
-	*/ var n = "important", i = " !important", o$2 = e$7(class extends i$4 {
+	*/ var n = "important";
+	var i = " !important";
+	var o$2 = e$7(class extends i$4 {
 		constructor(t) {
 			if (super(t), t.type !== t$3.ATTRIBUTE || "style" !== t.name || t.strings?.length > 2) throw Error("The `styleMap` directive must be used in the `style` attribute and must be the only part in the attribute.");
 		}
@@ -11630,7 +11688,7 @@
 		elements?.forEach(removeAllEventListeners);
 	};
 	//#endregion
-	//#region \0@oxc-project+runtime@0.138.0/helpers/esm/taggedTemplateLiteral.js
+	//#region \0@oxc-project+runtime@0.139.0/helpers/esm/taggedTemplateLiteral.js
 	function _taggedTemplateLiteral(e, t) {
 		return t || (t = e.slice(0)), Object.freeze(Object.defineProperties(e, { raw: { value: Object.freeze(t) } }));
 	}
@@ -11762,10 +11820,13 @@
 			await manga.before(manga.begin ?? 0);
 		}
 		document.head.innerHTML += wrapStyle("externals", externalStyle_default);
-		const viewer = document.createElement("manga-online-viewer");
-		viewer.loadMode = site?.start ?? getSettingsValue("loadMode");
-		viewer.manga = manga;
-		document.body.appendChild(viewer);
+		waitWithTimeout(unsafeWindow.customElements.whenDefined("manga-online-viewer"), 1e4).then(() => {
+			const viewer = document.createElement("manga-online-viewer");
+			viewer.loadMode = site?.start ?? getSettingsValue("loadMode");
+			viewer.manga = manga;
+			document.body.appendChild(viewer);
+			logScript(`Viewer Ready`, viewer);
+		}).catch((reason) => logScript("Define WebComponent failed", reason));
 	}
 	/**
 	* Main script entry point. Finds the current site, runs tests, and starts the viewer.
@@ -12340,6 +12401,27 @@
 				prev,
 				next,
 				listImages
+			};
+		}
+	};
+	//#endregion
+	//#region src/main/demonicscans.ts
+	var demonicscans = {
+		name: "DemonicScans",
+		url: /https?:\/\/(www\.)?demonicscans\.org\/(title\/.+\/chapter\/.+|chaptered\.php\?manga=\d+&chapter=.+)/,
+		homepage: "https://demonicscans.org/",
+		language: [Language.ENGLISH],
+		category: Category.MANGA,
+		waitEle: "img.imgholder[src*=\"cdn.demoniclibs.com\"]",
+		async run() {
+			const images = [...document.querySelectorAll("img.imgholder[src*=\"cdn.demoniclibs.com\"]")].map((img) => img.getAttribute("data-src") || img.getAttribute("src") || "");
+			return {
+				title: document.querySelector("title")?.textContent?.trim(),
+				series: document.querySelector("h1 a")?.getAttribute("href"),
+				pages: images.length,
+				prev: document.querySelector(".prevchap")?.getAttribute("href"),
+				next: document.querySelector(".nextchap")?.getAttribute("href"),
+				listImages: images
 			};
 		}
 	};
@@ -13314,6 +13396,7 @@
 		bilibilicomics,
 		comick,
 		comix,
+		demonicscans,
 		dynastyscans,
 		flamecomics,
 		ikigai,

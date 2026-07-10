@@ -47,6 +47,7 @@ Download the standalone HTML file from the link below. Open it in your browser t
 - [BilibiliComics](https://www.bilibilicomics.net/) _[English]_
 - [Comick](https://comick.io/) _[English]_
 - [Comix.to](https://comix.to/) _[English]_
+- [DemonicScans](https://demonicscans.org/) _[English]_
 - [Dynasty-Scans](https://dynasty-scans.com/) _[English]_
 - [Flame Comics](https://flamecomics.xyz/) _[English]_
 - [Kagane](https://kagane.org/) _[English]_
