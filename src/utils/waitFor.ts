@@ -163,12 +163,16 @@ export async function waitWithTimer<T>(promise: Promise<T>, timer: number = 1000
 
 /**
  * Waits for a promise to resolve, but with a maximum timeout.
- * If the promise does not resolve within the timeout period, the race is lost.
+ * If the promise does not resolve within the timeout period, the race is lost and the returned promise rejects.
  * @template T
  * @param {Promise<T>} promise - The promise to wait for.
  * @param {number} [timeout=5000] - The maximum time to wait in milliseconds.
- * @returns {Promise<T | boolean>} A promise that resolves with the result of the input promise, or `false` if it times out.
+ * @returns {Promise<T>} A promise that resolves with the result of the input promise, or rejects if it times out.
  */
-export async function waitWithTimeout(promise: Promise<boolean>, timeout: number = 5000) {
-  return Promise.race([promise, waitForTimer(timeout, false)]);
+export async function waitWithTimeout<T>(promise: Promise<T>, timeout: number = 5000): Promise<T> {
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    setTimeout(() => reject(new Error(`Timeout after ${timeout} ms`)), timeout);
+  });
+
+  return Promise.race([promise, timeoutPromise]);
 }

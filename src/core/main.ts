@@ -13,6 +13,7 @@ import '../ui';
 import type App from '../ui/App.ts';
 import externalCSS from '../ui/styles/externalStyle.ts';
 import { wrapStyle } from '../utils/css.ts';
+import { waitWithTimeout } from '../utils/waitFor.ts';
 
 /**
  * Prepares the page to display the manga viewer.
@@ -23,6 +24,7 @@ import { wrapStyle } from '../utils/css.ts';
  */
 export async function preparePage([site, manga]: [ISite | undefined, IManga]): Promise<void> {
   logScript(`Found Pages: ${manga.pages} in ${site?.name}`);
+
   if (!manga.title) {
     manga.title = document.querySelector('title')?.textContent?.trim();
   }
@@ -32,10 +34,15 @@ export async function preparePage([site, manga]: [ISite | undefined, IManga]): P
     await manga.before(manga.begin ?? 0);
   }
   document.head.innerHTML += wrapStyle('externals', externalCSS);
-  const viewer = document.createElement('manga-online-viewer') as App;
-  viewer.loadMode = site?.start ?? getSettingsValue('loadMode');
-  viewer.manga = manga;
-  document.body.appendChild(viewer);
+  waitWithTimeout(unsafeWindow.customElements.whenDefined('manga-online-viewer'), 10000)
+    .then(() => {
+      const viewer = document.createElement('manga-online-viewer') as App;
+      viewer.loadMode = site?.start ?? getSettingsValue('loadMode');
+      viewer.manga = manga;
+      document.body.appendChild(viewer);
+      logScript(`Viewer Ready`, viewer);
+    })
+    .catch(reason => logScript('Define WebComponent failed', reason));
 }
 
 /**
