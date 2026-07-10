@@ -4,6 +4,7 @@ import batoto from './batoto';
 import bilibilicomics from './bilibilicomics';
 import comick from './comick';
 import comix from './comix';
+import demonicscans from './demonicscans';
 import dysnatyscans from './dysnatyscans';
 import flamecomics from './flamecomics';
 import foolslide from './foolslide';
@@ -49,6 +50,7 @@ const sites: ISite[] = [
   bilibilicomics,
   comick,
   comix,
+  demonicscans,
   dysnatyscans,
   flamecomics,
   ikigai,
