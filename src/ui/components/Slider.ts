@@ -45,7 +45,6 @@ export default class Slider extends LitElement {
   @state() private draggingThumb: 'min' | 'max' | 'single' | null = null;
 
   @query('.mov-slider__track') private track?: HTMLElement;
-  @query('.mov-slider__live-region') private liveRegion?: HTMLElement;
 
   private activeDrag: {
     thumb: 'min' | 'max' | 'single';

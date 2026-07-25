@@ -4,7 +4,7 @@
  * @type {string[]}
  */
 export const requiredScripts: string[] = [
-  'https://cdn.jsdelivr.net/npm/colorjs.io@0.6.1/dist/color.global.min.js',
+  'https://cdn.jsdelivr.net/npm/colorjs.io@0.7.1/dist/color.global.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.9.1/jszip.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.js',
   'https://cdn.jsdelivr.net/npm/lodash@4.17.23/lodash.min.js',
